@@ -263,7 +263,7 @@ if (isset($_GET["elastic"])) {
 
 	function db_collation($db, $collations) {
 	}
-	
+
 	function engines() {
 		return array();
 	}
