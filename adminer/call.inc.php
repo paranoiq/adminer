@@ -28,13 +28,13 @@ if (!$error && $_POST) {
 		}
 		$call[] = (isset($out[$key]) ? "@" . idf_escape($field["field"]) : $val);
 	}
-	
+
 	$query = (isset($_GET["callf"]) ? "SELECT" : "CALL") . " " . table($PROCEDURE) . "(" . implode(", ", $call) . ")";
 	$start = microtime(true);
 	$result = $connection->multi_query($query);
 	$affected = $connection->affected_rows; // getting warnigns overwrites this
 	echo $adminer->selectQuery($query, $start, !$result);
-	
+
 	if (!$result) {
 		echo "<p class='error'>" . error() . "\n";
 	} else {
@@ -42,7 +42,7 @@ if (!$error && $_POST) {
 		if (is_object($connection2)) {
 			$connection2->select_db(DB);
 		}
-		
+
 		do {
 			$result = $connection->store_result();
 			if (is_object($result)) {
@@ -51,7 +51,7 @@ if (!$error && $_POST) {
 				echo "<p class='message'>" . lang('Routine has been called, %d row(s) affected.', $affected) . "\n";
 			}
 		} while ($connection->next_result());
-		
+
 		if ($out) {
 			select($connection->query("SELECT " . implode(", ", $out)));
 		}
