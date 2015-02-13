@@ -6,7 +6,7 @@ $row = $_POST;
 if ($_POST && !$error && !$_POST["add"] && !$_POST["change"] && !$_POST["change-js"]) {
 	$message = ($_POST["drop"] ? lang('Foreign key has been dropped.') : ($name != "" ? lang('Foreign key has been altered.') : lang('Foreign key has been created.')));
 	$location = ME . "table=" . urlencode($TABLE);
-	
+
 	$row["source"] = array_filter($row["source"], 'strlen');
 	ksort($row["source"]); // enforce input order
 	$target = array();
@@ -14,7 +14,7 @@ if ($_POST && !$error && !$_POST["add"] && !$_POST["change"] && !$_POST["change-
 		$target[$key] = $row["target"][$key];
 	}
 	$row["target"] = $target;
-	
+
 	if ($jush == "sqlite") {
 		queries_redirect($location, $message, recreate_table($TABLE, $TABLE, array(), array(), array(" $name" => ($_POST["drop"] ? "" : " " . format_foreign_key($row)))));
 	} else {
