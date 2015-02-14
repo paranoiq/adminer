@@ -56,6 +56,7 @@ $translations = array(
 	'Show only errors' => 'Zobrazit pouze chyby',
 	// sprintf() format for time of the command
 	'%.3f s' => '%.3f s',
+	'%d m %.3f s' => '%d m %d s',
 	'History' => 'Historie',
 	'Clear' => 'Vyčistit',
 	'Edit all' => 'Upravit vše',
