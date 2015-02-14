@@ -718,7 +718,14 @@ function queries_redirect($location, $message, $redirect) {
 * @return string HTML code
 */
 function format_time($start) {
-	return lang('%.3f s', max(0, microtime(true) - $start));
+	$time = max(0, microtime(true) - $start);
+	if ($time < 60) {
+		return lang('%.3f s', $time);
+	} else {
+		$min = floor($time / 60);
+		$sec = round($time - $min * 60);
+		return lang('%d m %d s', $min, $sec);
+	}
 }
 
 /** Get relative REQUEST_URI
