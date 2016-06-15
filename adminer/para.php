@@ -25,6 +25,8 @@ function adminer_object() {
         //new AdminerTablesFilter,
         new AdminerSmartTablesFilter,
         //new AdminerEditForeign,
+        new AdminerTableLinks(),
+        new AdminerInformationSchemaLinks(),
     );
 
     /* It is possible to combine customization and plugins:
