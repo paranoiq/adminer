@@ -1,4 +1,9 @@
 <?php
+// silent warnings on PHP7
+set_error_handler(function () {
+   return true;
+});
+
 function adminer_object() {
     // required to run any plugin
     include_once "../plugins/plugin.php";
