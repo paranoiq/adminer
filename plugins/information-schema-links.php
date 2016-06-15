@@ -44,6 +44,11 @@ class AdminerInformationSchemaLinks
                     urlencode($val)
                 );
                 break;
+            case strstr($fieldName, 'latitude'):
+                $this->rowLatitude = $val;
+                break;
+            case strstr($fieldName, 'longitude'):
+                return sprintf('http://maps.google.com/maps?q=loc:%s,%s', $this->rowLatitude, $val);
         }
         return '';
     }
