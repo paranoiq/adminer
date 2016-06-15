@@ -845,7 +845,7 @@ function inputBlur() {
 * @return HTMLInputElement
 */
 function findDefaultSubmit(el) {
-	if (el.jushTextarea) {
+	/*if (el.jushTextarea) {
 		el = el.jushTextarea;
 	}
 	if (!el.form) {
@@ -857,7 +857,7 @@ function findDefaultSubmit(el) {
 		if (input.type == 'submit' && !input.style.zIndex) {
 			return input;
 		}
-	}
+	}*/
 }
 
 
