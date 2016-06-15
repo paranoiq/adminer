@@ -52,6 +52,10 @@ class Adminer {
 		return true;
 	}
 
+	function breadcrumbs($breadcrumb, $title) {
+		return true;
+	}
+
 	function loginForm() {
 		?>
 <table cellspacing="0">
