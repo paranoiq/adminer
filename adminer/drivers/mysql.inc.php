@@ -51,7 +51,7 @@ if (!defined("DRIVER")) {
 				$row = $result->fetch_array();
 				return $row[$field];
 			}
-			
+
 			function quote($string) {
 				return "'" . $this->escape_string($string) . "'";
 			}
@@ -345,14 +345,27 @@ if (!defined("DRIVER")) {
 
 	}
 
-
-
 	/** Escape database identifier
 	* @param string
 	* @return string
 	*/
 	function idf_escape($idf) {
-		return "`" . str_replace("`", "``", $idf) . "`";
+		return ansi_quotes()
+			? '"' . str_replace('"', '""', $idf) . '"'
+			: '`' . str_replace('`', '``', $idf) . '`';
+	}
+
+	/** ANSI_QUOTES mode is on.
+	 * @return bool
+	 */
+	function ansi_quotes() {
+		global $connection;
+		static $ansiQuotes;
+		if ($ansiQuotes === null) {
+			$result = $connection->result("SHOW VARIABLES LIKE 'sql_mode'", 1);
+			$ansiQuotes = strpos($result, 'ANSI') !== false;
+		}
+		return $ansiQuotes;
 	}
 
 	/** Get escaped table name
@@ -612,7 +625,8 @@ if (!defined("DRIVER")) {
 	*/
 	function view($name) {
 		global $connection;
-		return array("select" => preg_replace('~^(?:[^`]|`[^`]*`)*\s+AS\s+~isU', '', $connection->result("SHOW CREATE VIEW " . table($name), 1)));
+		$pattern = ansi_quotes() ? '~^(?:[^"]|"[^"]*")*\s+AS\s+~isU' : '~^(?:[^`]|`[^`]*`)*\s+AS\s+~isU';
+		return array("select" => preg_replace($pattern, '', $connection->result("SHOW CREATE VIEW " . table($name), 1)));
 	}
 
 	/** Get sorted grouped list of collations
@@ -848,7 +862,7 @@ if (!defined("DRIVER")) {
 		if ($name == "") {
 			return array();
 		}
-		$rows = get_rows("SHOW TRIGGERS WHERE `Trigger` = " . q($name));
+		$rows = get_rows("SHOW TRIGGERS WHERE " . idf_escape('Trigger') . " = " . q($name));
 		return reset($rows);
 	}
 
@@ -885,14 +899,16 @@ if (!defined("DRIVER")) {
 		$aliases = array("bool", "boolean", "integer", "double precision", "real", "dec", "numeric", "fixed", "national char", "national varchar");
 		$space = "(?:\\s|/\\*[\s\S]*?\\*/|(?:#|-- )[^\n]*\n?|--\r?\n)";
 		$type_pattern = "((" . implode("|", array_merge(array_keys($types), $aliases)) . ")\\b(?:\\s*\\(((?:[^'\")]|$enum_length)++)\\))?\\s*(zerofill\\s*)?(unsigned(?:\\s+zerofill)?)?)(?:\\s*(?:CHARSET|CHARACTER\\s+SET)\\s*['\"]?([^'\"\\s,]+)['\"]?)?";
-		$pattern = "$space*(" . ($type == "FUNCTION" ? "" : $inout) . ")?\\s*(?:`((?:[^`]|``)*)`\\s*|\\b(\\S+)\\s+)$type_pattern";
+		$string_pattern = ansi_quotes() ? '"((?:[^"]|"")*)"' : '`((?:[^`]|``)*)`';
+		$pattern = "$space*(" . ($type == "FUNCTION" ? "" : $inout) . ")?\\s*(?:$string_pattern\\s*|\\b(\\S+)\\s+)$type_pattern";
 		$create = $connection->result("SHOW CREATE $type " . idf_escape($name), 2);
 		preg_match("~\\(((?:$pattern\\s*,?)*)\\)\\s*" . ($type == "FUNCTION" ? "RETURNS\\s+$type_pattern\\s+" : "") . "(.*)~is", $create, $match);
 		$fields = array();
 		preg_match_all("~$pattern\\s*,?~is", $match[1], $matches, PREG_SET_ORDER);
 		foreach ($matches as $param) {
+			$name = (ansi_quotes() ? str_replace('""', '"', $param[2]) : str_replace("``", "`", $param[2])) . $param[3];
 			$fields[] = array(
-				"field" => str_replace("``", "`", $param[2]) . $param[3],
+				"field" => $name,
 				"type" => strtolower($param[5]),
 				"length" => preg_replace_callback("~$enum_length~s", 'normalize_enum', $param[6]),
 				"unsigned" => strtolower(preg_replace('~\s+~', ' ', trim("$param[8] $param[7]"))),
