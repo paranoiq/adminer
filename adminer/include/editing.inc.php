@@ -64,7 +64,8 @@ function select($result, $connection2 = null, $orgtables = array(), $limit = 0) 
 			if ($val === null) {
 				$val = "<i>NULL</i>";
 			} elseif ($blobs[$key] && !is_utf8($val)) {
-				$val = "<i>" . lang('%d byte(s)', strlen($val)) . "</i>"; //! link to download
+				//$val = "<i>" . lang('%d byte(s)', strlen($val)) . "</i>"; //! link to download
+				$val = "<i>" . bin2hex($val) . "</i>";
 			} else {
 				$val = h($val);
 				if ($types[$key] == 254) { // 254 - char
