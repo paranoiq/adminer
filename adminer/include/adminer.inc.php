@@ -546,6 +546,10 @@ class Adminer {
 			}
 		}
 		foreach ((array) $_GET["where"] as $key => $val) {
+			// remove '-' from uuids
+			if (preg_match('/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i', $val['val'])) {
+				$_GET['where'][$key]['val'] = $val['val'] = str_replace('-', '', $val['val']);
+			}
 			if ("$val[col]$val[val]" != "" && in_array($val["op"], $this->operators)) {
 				$prefix = "";
 				$cond = " $val[op]";
