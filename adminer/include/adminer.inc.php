@@ -297,7 +297,8 @@ class Adminer {
 	function selectVal($val, $link, $field, $original) {
 		$return = ($val === null ? "<i>NULL</i>" : (preg_match("~char|binary|boolean~", $field["type"]) && !preg_match("~var~", $field["type"]) ? "<code>$val</code>" : $val));
 		if (preg_match('~blob|bytea|raw|file~', $field["type"]) && !is_utf8($val)) {
-			$return = "<i>" . lang('%d byte(s)', strlen($original)) . "</i>";
+			//$return = "<i>" . lang('%d byte(s)', strlen($original)) . "</i>";
+			$return = "<i>" . bin2hex($original) . "</i>";
 		}
 		if (preg_match('~json~', $field["type"])) {
 			$return = "<code class='jush-js'>$return</code>";
